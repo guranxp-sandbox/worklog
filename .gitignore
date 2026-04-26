@@ -1,0 +1,15 @@
+# Maven
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.class
+
+# Logs
+backend/logs/*.log
+
+# OS
+.DS_Store

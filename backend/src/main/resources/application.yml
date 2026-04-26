@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: worklog
+  datasource:
+    url: jdbc:postgresql://localhost:5432/worklog
+    username: worklog
+    password: worklog
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.worklog: DEBUG
