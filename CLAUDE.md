@@ -27,3 +27,7 @@ Personal time-tracking app. Log clock-in/out, break stamps, project allocation, 
 1. **Event model first** — write the scenario in Markdown (commands → events → projections) before touching code
 2. **One scenario at a time** — complete event model → domain code → tests → push before starting the next
 3. Commit and push to GitHub after each scenario is green
+
+## Language
+
+All code and documentation must be written in English.
