@@ -13,3 +13,6 @@ backend/logs/*.log
 
 # OS
 .DS_Store
+
+# Claude internals
+.claude/worktrees/
