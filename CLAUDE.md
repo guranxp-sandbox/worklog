@@ -1,6 +1,6 @@
 # Worklog
 
-Personal time-tracking app. Log clock-in/out, break stamps, project allocation, and generate weekly reports.
+Personal time-tracking app. Log start-work/stop-work, break stamps, project allocation, and generate weekly reports.
 
 ## Tech Stack
 

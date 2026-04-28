@@ -36,20 +36,20 @@ A personal time-tracking app. Log when I start and stop working, allocate time t
 
 ### Core
 
-- Timestamps — clock in / clock out
-- Breaks — clock out / clock in for a break (not counted as work time)
+- Timestamps — start work / stop work
+- Breaks — stop work / start work for a break (not counted as work time)
 - A day can have **multiple time blocks** (start + end + optional project + free-text note)
 - Project is **optional** on a time block
-- Time blocks can be **edited after the fact** (e.g. forgot to clock out)
+- Time blocks can be **edited after the fact** (e.g. forgot to stop work)
 - Manual time entry
 
 ### Projects
 
 - ID + description
 - Predefined in the app
-- Assigned at clock-in or after the fact
+- Assigned at start-work time or after the fact
 
-### Clock-in Triggers
+### Start-Work Triggers
 
 - Button in the UI
 - WiFi connection (phase 2)
@@ -94,6 +94,6 @@ A personal time-tracking app. Log when I start and stop working, allocate time t
 1. ✅ Rename old repo to `worklog-demo` on GitHub
 2. ✅ Create new `worklog` repo
 3. ✅ Clone to Mac Mini
-4. ✅ Event modelling — scenario 1: clock in / clock out for a day
+4. ✅ Event modelling — scenario 1: start work / stop work for a day
 5. 🔲 Define aggregates
 6. 🔲 Start coding scenario 1
