@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worklog</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Worklog</h1>
+    <span id="today"></span>
+  </header>
+
+  <main>
+    <div id="status-bar">
+      <span id="status-indicator" class="status-unknown">&#9679;</span>
+      <span id="status-label">Backend: checking…</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" disabled>Clock In</button>
+      <button class="btn btn-secondary" disabled>Clock Out</button>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
