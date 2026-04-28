@@ -16,3 +16,4 @@ backend/logs/*.log
 
 # Claude internals
 .claude/worktrees/
+.claude/worktrees/
