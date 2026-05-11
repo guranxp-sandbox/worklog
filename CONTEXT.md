@@ -95,5 +95,8 @@ A personal time-tracking app. Log when I start and stop working, allocate time t
 2. ✅ Create new `worklog` repo
 3. ✅ Clone to Mac Mini
 4. ✅ Event modelling — scenario 1: start work / stop work for a day
-5. 🔲 Define aggregates
-6. 🔲 Start coding scenario 1
+5. ✅ Define aggregates
+6. ✅ Implement scenario 01: StartWork + StopWork (domain, application, API, tests)
+7. ✅ GitHub Actions CI
+8. 🔲 Wire up StartWork / StopWork buttons in frontend
+9. 🔲 Event modelling — scenario 02 (TBD)

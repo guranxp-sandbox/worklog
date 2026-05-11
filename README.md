@@ -1,6 +1,18 @@
 # Worklog
 
-Personal time-tracking app.
+Personal time-tracking app. Log when you start and stop working, allocate time to projects, and generate weekly reports.
+
+## Status
+
+- ✅ Scenario 01: StartWork / StopWork — fully implemented (domain, application, API, tests)
+- 🔲 Scenario 02: TBD
+
+## API
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/days/{date}/start-work` | Start a new time block |
+| POST | `/days/{date}/stop-work` | End the current open time block |
 
 ## Running locally
 
