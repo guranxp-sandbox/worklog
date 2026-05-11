@@ -98,5 +98,6 @@ A personal time-tracking app. Log when I start and stop working, allocate time t
 5. ✅ Define aggregates
 6. ✅ Implement scenario 01: StartWork + StopWork (domain, application, API, tests)
 7. ✅ GitHub Actions CI
-8. 🔲 Wire up StartWork / StopWork buttons in frontend
-9. 🔲 Event modelling — scenario 02 (TBD)
+8. ✅ CurrentDayView read model — proper CQRS projection (GET /days/{date})
+9. 🔲 Wire up StartWork / StopWork buttons in frontend
+10. 🔲 Event modelling — scenario 02 (TBD)

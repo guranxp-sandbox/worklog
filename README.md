@@ -11,6 +11,7 @@ Personal time-tracking app. Log when you start and stop working, allocate time t
 
 | Method | Path | Description |
 |--------|------|-------------|
+| GET  | `/days/{date}?userId={uuid}` | Get current day view (status, active block, completed blocks) |
 | POST | `/days/{date}/start-work` | Start a new time block |
 | POST | `/days/{date}/stop-work` | End the current open time block |
 
