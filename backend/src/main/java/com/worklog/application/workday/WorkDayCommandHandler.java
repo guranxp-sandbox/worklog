@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 public class WorkDayCommandHandler {
@@ -24,43 +25,39 @@ public class WorkDayCommandHandler {
     }
 
     public void handle(final StartWorkCommand cmd) {
-        if (workDayRepository.isRequestAlreadyProcessed(cmd.requestId())) {
-            throw new DuplicateRequestException(cmd.requestId());
-        }
-
+        checkIdempotency(cmd.requestId());
         final WorkDayId workDayId = new WorkDayId(cmd.userId(), cmd.date());
-        final WorkDay workDay = workDayRepository.load(workDayId)
-                .orElseGet(() -> WorkDay.empty(workDayId));
+        final WorkDay workDay = workDayRepository.load(workDayId).orElseGet(() -> WorkDay.empty(workDayId));
+        checkVersion(workDayId, workDay, cmd.expectedVersion());
 
-        if (workDay.getVersion() != cmd.expectedVersion()) {
-            throw new OptimisticLockException(workDayId, cmd.expectedVersion(), workDay.getVersion());
-        }
-
-        final Instant now = clock.instant();
-        workDay.startWork(cmd.timeBlockId(), cmd.timestamp(), cmd.timezone(), cmd.projectId(), now);
+        workDay.startWork(cmd.timeBlockId(), cmd.timestamp(), cmd.timezone(), cmd.projectId(), clock.instant());
         workDayRepository.save(workDay, cmd.requestId());
 
         log.info("StartWork processed: workDay={} timeBlock={}", workDayId.toStreamId(), cmd.timeBlockId());
     }
 
     public void handle(final StopWorkCommand cmd) {
-        if (workDayRepository.isRequestAlreadyProcessed(cmd.requestId())) {
-            throw new DuplicateRequestException(cmd.requestId());
-        }
-
+        checkIdempotency(cmd.requestId());
         final WorkDayId workDayId = new WorkDayId(cmd.userId(), cmd.date());
         final WorkDay workDay = workDayRepository.load(workDayId)
-                .orElseThrow(() -> new DomainException(
-                        "Cannot stop work: no open time block exists for " + cmd.date()));
+                .orElseThrow(() -> new DomainException("Cannot stop work: no open time block exists for " + cmd.date()));
+        checkVersion(workDayId, workDay, cmd.expectedVersion());
 
-        if (workDay.getVersion() != cmd.expectedVersion()) {
-            throw new OptimisticLockException(workDayId, cmd.expectedVersion(), workDay.getVersion());
-        }
-
-        final Instant now = clock.instant();
-        workDay.stopWork(cmd.timeBlockId(), cmd.timestamp(), cmd.timezone(), cmd.projectId(), cmd.note(), now);
+        workDay.stopWork(cmd.timeBlockId(), cmd.timestamp(), cmd.timezone(), cmd.projectId(), cmd.note(), clock.instant());
         workDayRepository.save(workDay, cmd.requestId());
 
         log.info("StopWork processed: workDay={} timeBlock={}", workDayId.toStreamId(), cmd.timeBlockId());
+    }
+
+    private void checkIdempotency(final UUID requestId) {
+        if (workDayRepository.isRequestAlreadyProcessed(requestId)) {
+            throw new DuplicateRequestException(requestId);
+        }
+    }
+
+    private void checkVersion(final WorkDayId workDayId, final WorkDay workDay, final int expectedVersion) {
+        if (workDay.getVersion() != expectedVersion) {
+            throw new OptimisticLockException(workDayId, expectedVersion, workDay.getVersion());
+        }
     }
 }
