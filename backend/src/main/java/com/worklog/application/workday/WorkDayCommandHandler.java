@@ -1,5 +1,6 @@
 package com.worklog.application.workday;
 
+import com.worklog.domain.DomainException;
 import com.worklog.domain.workday.WorkDay;
 import com.worklog.domain.workday.WorkDayId;
 import org.slf4j.Logger;
@@ -17,51 +18,47 @@ public class WorkDayCommandHandler {
     private final WorkDayRepository workDayRepository;
     private final Clock clock;
 
-    public WorkDayCommandHandler(WorkDayRepository workDayRepository, Clock clock) {
+    public WorkDayCommandHandler(final WorkDayRepository workDayRepository, final Clock clock) {
         this.workDayRepository = workDayRepository;
         this.clock = clock;
     }
 
-    public void handle(StartWorkCommand cmd) {
+    public void handle(final StartWorkCommand cmd) {
         if (workDayRepository.isRequestAlreadyProcessed(cmd.requestId())) {
             throw new DuplicateRequestException(cmd.requestId());
         }
 
-        WorkDayId workDayId = new WorkDayId(cmd.userId(), cmd.date());
-
-        WorkDay workDay = workDayRepository.load(workDayId)
+        final WorkDayId workDayId = new WorkDayId(cmd.userId(), cmd.date());
+        final WorkDay workDay = workDayRepository.load(workDayId)
                 .orElseGet(() -> WorkDay.empty(workDayId));
 
         if (workDay.getVersion() != cmd.expectedVersion()) {
             throw new OptimisticLockException(workDayId, cmd.expectedVersion(), workDay.getVersion());
         }
 
-        Instant now = clock.instant();
+        final Instant now = clock.instant();
         workDay.startWork(cmd.timeBlockId(), cmd.timestamp(), cmd.timezone(), cmd.projectId(), now);
-
         workDayRepository.save(workDay, cmd.requestId());
 
         log.info("StartWork processed: workDay={} timeBlock={}", workDayId.toStreamId(), cmd.timeBlockId());
     }
 
-    public void handle(StopWorkCommand cmd) {
+    public void handle(final StopWorkCommand cmd) {
         if (workDayRepository.isRequestAlreadyProcessed(cmd.requestId())) {
             throw new DuplicateRequestException(cmd.requestId());
         }
 
-        WorkDayId workDayId = new WorkDayId(cmd.userId(), cmd.date());
-
-        WorkDay workDay = workDayRepository.load(workDayId)
-                .orElseThrow(() -> new com.worklog.domain.DomainException(
+        final WorkDayId workDayId = new WorkDayId(cmd.userId(), cmd.date());
+        final WorkDay workDay = workDayRepository.load(workDayId)
+                .orElseThrow(() -> new DomainException(
                         "Cannot stop work: no open time block exists for " + cmd.date()));
 
         if (workDay.getVersion() != cmd.expectedVersion()) {
             throw new OptimisticLockException(workDayId, cmd.expectedVersion(), workDay.getVersion());
         }
 
-        Instant now = clock.instant();
+        final Instant now = clock.instant();
         workDay.stopWork(cmd.timeBlockId(), cmd.timestamp(), cmd.timezone(), cmd.projectId(), cmd.note(), now);
-
         workDayRepository.save(workDay, cmd.requestId());
 
         log.info("StopWork processed: workDay={} timeBlock={}", workDayId.toStreamId(), cmd.timeBlockId());
