@@ -56,6 +56,17 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Design by Contract -->
+        <dependency>
+            <groupId>org.valid4j</groupId>
+            <artifactId>valid4j</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

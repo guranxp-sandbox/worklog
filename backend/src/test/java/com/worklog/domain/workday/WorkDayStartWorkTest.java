@@ -3,6 +3,7 @@ package com.worklog.domain.workday;
 import com.worklog.domain.DomainException;
 import com.worklog.domain.workday.events.TimeBlockStarted;
 import org.junit.jupiter.api.Test;
+import org.valid4j.errors.RequireViolation;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -24,13 +25,13 @@ class WorkDayStartWorkTest {
 
     @Test
     void happyPath_emitsTimeBlockStarted() {
-        WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
-        UUID timeBlockId = UUID.randomUUID();
+        final WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
+        final UUID timeBlockId = UUID.randomUUID();
 
         workDay.startWork(timeBlockId, START_AT, TZ, null, NOW);
 
         assertThat(workDay.getUncommittedEvents()).hasSize(1);
-        TimeBlockStarted event = (TimeBlockStarted) workDay.getUncommittedEvents().get(0);
+        final TimeBlockStarted event = (TimeBlockStarted) workDay.getUncommittedEvents().get(0);
         assertThat(event.timeBlockId()).isEqualTo(timeBlockId);
         assertThat(event.startedAt()).isEqualTo(START_AT);
         assertThat(event.userId()).isEqualTo(USER_ID);
@@ -41,45 +42,37 @@ class WorkDayStartWorkTest {
 
     @Test
     void happyPath_withProject() {
-        WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
-        UUID projectId = UUID.randomUUID();
+        final WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
+        final UUID projectId = UUID.randomUUID();
 
         workDay.startWork(UUID.randomUUID(), START_AT, TZ, projectId, NOW);
 
-        TimeBlockStarted event = (TimeBlockStarted) workDay.getUncommittedEvents().get(0);
+        final TimeBlockStarted event = (TimeBlockStarted) workDay.getUncommittedEvents().get(0);
         assertThat(event.projectId()).isEqualTo(projectId);
     }
 
     @Test
-    void rejects_futureTimestamp() {
-        WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
-        Instant future = NOW.plusSeconds(60);
-
-        assertThatThrownBy(() -> workDay.startWork(UUID.randomUUID(), future, TZ, null, NOW))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("future");
+    void requireViolation_futureTimestamp() {
+        assertThatThrownBy(() -> WorkDay.empty(WORK_DAY_ID).startWork(UUID.randomUUID(), NOW.plusSeconds(60), TZ, null, NOW))
+                .isInstanceOf(RequireViolation.class);
     }
 
     @Test
-    void rejects_timestampOnWrongDate() {
-        WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
-        // 2026-04-27T22:01:00Z = 2026-04-28T00:01:00 CEST  → still April 28 in Stockholm, OK
-        // 2026-04-27T21:59:00Z = 2026-04-27T23:59:00 CEST  → April 27 in Stockholm, WRONG date
-        Instant wrongDate = Instant.parse("2026-04-27T21:59:00Z");
-        Instant nowYesterday = Instant.parse("2026-04-27T22:30:00Z");
+    void requireViolation_timestampOnWrongDate() {
+        // 2026-04-27T21:59:00Z = 2026-04-27T23:59:00 CEST → April 27 in Stockholm, wrong date
+        final Instant wrongDate = Instant.parse("2026-04-27T21:59:00Z");
+        final Instant nowYesterday = Instant.parse("2026-04-27T22:30:00Z");
 
-        assertThatThrownBy(() -> workDay.startWork(UUID.randomUUID(), wrongDate, TZ, null, nowYesterday))
-                .isInstanceOf(DomainException.class)
-                .hasMessageContaining("2026-04-28");
+        assertThatThrownBy(() -> WorkDay.empty(WORK_DAY_ID).startWork(UUID.randomUUID(), wrongDate, TZ, null, nowYesterday))
+                .isInstanceOf(RequireViolation.class);
     }
 
     @Test
-    void rejects_whenOpenTimeBlockExists() {
-        WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
+    void domainException_whenOpenTimeBlockExists() {
+        final WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
         workDay.startWork(UUID.randomUUID(), START_AT, TZ, null, NOW);
 
-        // laterStart is before NOW so the future-timestamp guard does not fire first
-        Instant laterStart = Instant.parse("2026-04-28T06:30:00Z");
+        final Instant laterStart = Instant.parse("2026-04-28T06:30:00Z");
         assertThatThrownBy(() -> workDay.startWork(UUID.randomUUID(), laterStart, TZ, null, NOW))
                 .isInstanceOf(DomainException.class)
                 .hasMessageContaining("open time block");
@@ -87,17 +80,15 @@ class WorkDayStartWorkTest {
 
     @Test
     void version_isZeroForEmptyWorkDay() {
-        WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
-        assertThat(workDay.getVersion()).isZero();
+        assertThat(WorkDay.empty(WORK_DAY_ID).getVersion()).isZero();
     }
 
     @Test
     void version_reflectsCommittedEvents_afterReconstitution() {
-        WorkDay original = WorkDay.empty(WORK_DAY_ID);
+        final WorkDay original = WorkDay.empty(WORK_DAY_ID);
         original.startWork(UUID.randomUUID(), START_AT, TZ, null, NOW);
-        var events = original.getUncommittedEvents();
 
-        WorkDay reconstituted = WorkDay.reconstitute(WORK_DAY_ID, events);
+        final WorkDay reconstituted = WorkDay.reconstitute(WORK_DAY_ID, original.getUncommittedEvents());
 
         assertThat(reconstituted.getVersion()).isEqualTo(1);
         assertThat(reconstituted.hasOpenTimeBlock()).isTrue();
@@ -105,9 +96,7 @@ class WorkDayStartWorkTest {
 
     @Test
     void timestamp_exactlyEqualToNow_isAccepted() {
-        WorkDay workDay = WorkDay.empty(WORK_DAY_ID);
-
-        assertThatCode(() -> workDay.startWork(UUID.randomUUID(), NOW, TZ, null, NOW))
+        assertThatCode(() -> WorkDay.empty(WORK_DAY_ID).startWork(UUID.randomUUID(), NOW, TZ, null, NOW))
                 .doesNotThrowAnyException();
     }
 }

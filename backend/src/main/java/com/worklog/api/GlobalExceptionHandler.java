@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.valid4j.errors.RequireViolation;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,10 +31,18 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(RequireViolation.class)
+    public ProblemDetail handleRequireViolation(final RequireViolation ex) {
+        log.error("Precondition violated — this is a bug", ex);
+        final ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problem.setTitle("Internal server error");
+        return problem;
+    }
+
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleUnexpected(Exception ex) {
+    public ProblemDetail handleUnexpected(final Exception ex) {
         log.error("Unexpected error", ex);
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        final ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         problem.setTitle("Internal server error");
         return problem;
     }
