@@ -29,4 +29,12 @@ public class GlobalExceptionHandler {
         problem.setTitle("Version conflict");
         return problem;
     }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleUnexpected(Exception ex) {
+        log.error("Unexpected error", ex);
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        problem.setTitle("Internal server error");
+        return problem;
+    }
 }
