@@ -2,6 +2,7 @@ package com.worklog.api.workday;
 
 import com.worklog.application.workday.DuplicateRequestException;
 import com.worklog.application.workday.StartWorkCommand;
+import com.worklog.application.workday.StopWorkCommand;
 import com.worklog.application.workday.WorkDayCommandHandler;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,34 @@ public class WorkDayController {
                     .body(new StartWorkResponse(request.timeBlockId(), timestamp));
         } catch (DuplicateRequestException e) {
             return ResponseEntity.ok(new StartWorkResponse(request.timeBlockId(), timestamp));
+        }
+    }
+
+    @PostMapping("/{date}/stop-work")
+    public ResponseEntity<StopWorkResponse> stopWork(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestBody StopWorkRequest request) {
+
+        Instant timestamp = request.timestamp() != null ? request.timestamp() : Instant.now();
+
+        StopWorkCommand command = new StopWorkCommand(
+                request.userId(),
+                date,
+                request.timeBlockId(),
+                request.requestId(),
+                timestamp,
+                request.timezone(),
+                request.projectId(),
+                request.note(),
+                request.expectedVersion()
+        );
+
+        try {
+            commandHandler.handle(command);
+            return ResponseEntity.status(201)
+                    .body(new StopWorkResponse(request.timeBlockId(), timestamp));
+        } catch (DuplicateRequestException e) {
+            return ResponseEntity.ok(new StopWorkResponse(request.timeBlockId(), timestamp));
         }
     }
 }

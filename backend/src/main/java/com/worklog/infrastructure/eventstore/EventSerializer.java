@@ -3,6 +3,7 @@ package com.worklog.infrastructure.eventstore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.worklog.domain.DomainEvent;
+import com.worklog.domain.workday.events.TimeBlockEnded;
 import com.worklog.domain.workday.events.TimeBlockStarted;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,8 @@ import java.util.Map;
 public class EventSerializer {
 
     private static final Map<String, Class<? extends DomainEvent>> EVENT_TYPES = Map.of(
-            "TimeBlockStarted", TimeBlockStarted.class
+            "TimeBlockStarted", TimeBlockStarted.class,
+            "TimeBlockEnded", TimeBlockEnded.class
     );
 
     private final ObjectMapper objectMapper;

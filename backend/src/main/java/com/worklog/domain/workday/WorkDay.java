@@ -2,6 +2,7 @@ package com.worklog.domain.workday;
 
 import com.worklog.domain.DomainEvent;
 import com.worklog.domain.Guard;
+import com.worklog.domain.workday.events.TimeBlockEnded;
 import com.worklog.domain.workday.events.TimeBlockStarted;
 
 import java.time.Instant;
@@ -63,6 +64,27 @@ public class WorkDay {
         uncommittedEvents.add(event);
     }
 
+    public void stopWork(UUID timeBlockId, Instant timestamp, ZoneId timezone, UUID projectId, String note, Instant now) {
+        Guard.require(!timestamp.isAfter(now),
+                "Timestamp must not be in the future");
+
+        TimeBlock openBlock = timeBlocks.stream()
+                .filter(TimeBlock::isOpen)
+                .findFirst()
+                .orElseThrow(() -> new com.worklog.domain.DomainException(
+                        "Cannot stop work: no open time block exists for " + id.date()));
+
+        Guard.require(openBlock.getId().equals(timeBlockId),
+                "timeBlockId does not match the open time block");
+
+        Guard.require(timestamp.isAfter(openBlock.getStartedAt()),
+                "End time must be strictly after start time");
+
+        TimeBlockEnded event = new TimeBlockEnded(id.userId(), id, timeBlockId, timestamp, timezone, projectId, note);
+        applyNew(event);
+        uncommittedEvents.add(event);
+    }
+
     // ── State queries ────────────────────────────────────────────────────────
 
     public boolean hasOpenTimeBlock() {
@@ -84,6 +106,11 @@ public class WorkDay {
     private void applyState(DomainEvent event) {
         if (event instanceof TimeBlockStarted e) {
             timeBlocks.add(new TimeBlock(e.timeBlockId(), e.startedAt(), null, e.projectId()));
+        } else if (event instanceof TimeBlockEnded e) {
+            timeBlocks.stream()
+                    .filter(tb -> tb.getId().equals(e.timeBlockId()))
+                    .findFirst()
+                    .ifPresent(tb -> tb.close(e.endedAt(), e.projectId()));
         }
     }
 

@@ -21,6 +21,13 @@ public class TimeBlock {
         return endedAt == null;
     }
 
+    public void close(Instant endedAt, UUID projectId) {
+        this.endedAt = endedAt;
+        if (projectId != null) {
+            this.projectId = projectId;
+        }
+    }
+
     public UUID getId() { return id; }
     public Instant getStartedAt() { return startedAt; }
     public Instant getEndedAt() { return endedAt; }
