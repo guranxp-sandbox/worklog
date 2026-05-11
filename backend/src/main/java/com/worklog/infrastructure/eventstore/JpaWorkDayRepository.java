@@ -1,5 +1,6 @@
 package com.worklog.infrastructure.eventstore;
 
+import com.worklog.application.workday.CurrentDayProjector;
 import com.worklog.application.workday.DuplicateRequestException;
 import com.worklog.application.workday.WorkDayRepository;
 import com.worklog.domain.DomainEvent;
@@ -19,10 +20,13 @@ public class JpaWorkDayRepository implements WorkDayRepository {
 
     private final EventStoreJpaRepository jpaRepository;
     private final EventSerializer serializer;
+    private final CurrentDayProjector projector;
 
-    public JpaWorkDayRepository(EventStoreJpaRepository jpaRepository, EventSerializer serializer) {
+    public JpaWorkDayRepository(EventStoreJpaRepository jpaRepository, EventSerializer serializer,
+                                 CurrentDayProjector projector) {
         this.jpaRepository = jpaRepository;
         this.serializer = serializer;
+        this.projector = projector;
     }
 
     @Override
@@ -72,6 +76,9 @@ public class JpaWorkDayRepository implements WorkDayRepository {
                         workDay.getId(), workDay.getVersion(), nextSeq - 2);
             }
         }
+
+        int newVersion = workDay.getVersion() + uncommitted.size();
+        projector.project(workDay.getId(), newVersion, uncommitted);
 
         workDay.markEventsAsCommitted();
     }
