@@ -45,6 +45,7 @@ public class WorkDayCommandHandler {
         checkIdempotency(cmd.requestId());
         final Instant now = clock.instant();
         checkNotInFuture(cmd.timestamp(), now);
+        checkBelongsToWorkDay(cmd.timestamp(), cmd.timezone(), cmd.date());
 
         final WorkDayId workDayId = new WorkDayId(cmd.userId(), cmd.date());
         final WorkDay workDay = workDayRepository.load(workDayId)
