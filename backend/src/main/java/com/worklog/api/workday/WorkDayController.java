@@ -35,7 +35,20 @@ public class WorkDayController {
     public ResponseEntity<StartWorkResponse> startWork(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate date,
             @RequestBody final StartWorkRequest request) {
-        final Instant timestamp = resolveTimestamp(request.timestamp());
+        return doStartWork(date, request, resolveTimestamp(request.timestamp()));
+    }
+
+    @PostMapping("/{date}/stop-work")
+    public ResponseEntity<StopWorkResponse> stopWork(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate date,
+            @RequestBody final StopWorkRequest request) {
+        return doStopWork(date, request, resolveTimestamp(request.timestamp()));
+    }
+
+    private ResponseEntity<StartWorkResponse> doStartWork(
+        final LocalDate date,
+        final StartWorkRequest request,
+        final Instant timestamp) {
         try {
             commandHandler.handle(request.toCommand(date, timestamp));
             return ResponseEntity.status(201).body(new StartWorkResponse(request.timeBlockId(), timestamp));
@@ -44,11 +57,10 @@ public class WorkDayController {
         }
     }
 
-    @PostMapping("/{date}/stop-work")
-    public ResponseEntity<StopWorkResponse> stopWork(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate date,
-            @RequestBody final StopWorkRequest request) {
-        final Instant timestamp = resolveTimestamp(request.timestamp());
+    private ResponseEntity<StopWorkResponse> doStopWork(
+        final LocalDate date,
+        final StopWorkRequest request,
+        final Instant timestamp) {
         try {
             commandHandler.handle(request.toCommand(date, timestamp));
             return ResponseEntity.status(201).body(new StopWorkResponse(request.timeBlockId(), timestamp));
