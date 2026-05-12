@@ -167,6 +167,30 @@ class StopWorkIntegrationTest {
     }
 
     @Test
+    void stopWork_timestampDateMismatch_returns422() throws Exception {
+        String date = "2020-04-07";
+        UUID userId = UUID.randomUUID();
+        UUID timeBlockId = UUID.randomUUID();
+
+        startWork(date, "2020-04-07T07:00:00Z", userId, timeBlockId);
+
+        String body = objectMapper.writeValueAsString(Map.of(
+                "userId", userId,
+                "timeBlockId", timeBlockId,
+                "requestId", UUID.randomUUID(),
+                "timestamp", "2020-04-07T23:00:00Z", // 01:00 next day in Europe/Stockholm (UTC+2)
+                "timezone", TIMEZONE,
+                "expectedVersion", 1
+        ));
+
+        mockMvc.perform(post("/days/" + date + "/stop-work")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("does not belong to work day")));
+    }
+
+    @Test
     void stopWork_versionConflict_returns409() throws Exception {
         String date = "2020-04-06";
         UUID userId = UUID.randomUUID();
