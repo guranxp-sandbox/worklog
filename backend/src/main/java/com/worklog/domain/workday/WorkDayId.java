@@ -9,10 +9,10 @@ public record WorkDayId(UUID userId, LocalDate date) {
         return userId + ":" + date;
     }
 
-    public static WorkDayId fromStreamId(String streamId) {
-        int sep = streamId.indexOf(':');
-        UUID userId = UUID.fromString(streamId.substring(0, sep));
-        LocalDate date = LocalDate.parse(streamId.substring(sep + 1));
+    public static WorkDayId fromStreamId(final String streamId) {
+        final int sep = streamId.indexOf(':');
+        final UUID userId = UUID.fromString(streamId.substring(0, sep));
+        final LocalDate date = LocalDate.parse(streamId.substring(sep + 1));
         return new WorkDayId(userId, date);
     }
 }

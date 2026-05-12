@@ -20,24 +20,24 @@ public class JpaCurrentDayProjectionRepository implements CurrentDayProjectionRe
     private final CurrentDayProjectionJpaRepository jpaRepository;
     private final ObjectMapper objectMapper;
 
-    public JpaCurrentDayProjectionRepository(CurrentDayProjectionJpaRepository jpaRepository,
-                                              ObjectMapper objectMapper) {
+    public JpaCurrentDayProjectionRepository(final CurrentDayProjectionJpaRepository jpaRepository,
+                                              final ObjectMapper objectMapper) {
         this.jpaRepository = jpaRepository;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public Optional<CurrentDayView> find(UUID userId, LocalDate date) {
-        String id = new WorkDayId(userId, date).toStreamId();
+    public Optional<CurrentDayView> find(final UUID userId, final LocalDate date) {
+        final String id = new WorkDayId(userId, date).toStreamId();
         return jpaRepository.findById(id).map(this::toView);
     }
 
     @Override
-    public void save(UUID userId, CurrentDayView view) {
-        String id = new WorkDayId(userId, view.date()).toStreamId();
+    public void save(final UUID userId, final CurrentDayView view) {
+        final String id = new WorkDayId(userId, view.date()).toStreamId();
 
-        TimeBlockView active = view.activeTimeBlock();
-        CurrentDayProjectionEntity entity = new CurrentDayProjectionEntity(
+        final TimeBlockView active = view.activeTimeBlock();
+        final CurrentDayProjectionEntity entity = new CurrentDayProjectionEntity(
                 id,
                 userId,
                 view.date(),
@@ -52,33 +52,33 @@ public class JpaCurrentDayProjectionRepository implements CurrentDayProjectionRe
         jpaRepository.save(entity);
     }
 
-    private CurrentDayView toView(CurrentDayProjectionEntity e) {
-        TimeBlockView active = e.getActiveTimeBlockId() != null
+    private CurrentDayView toView(final CurrentDayProjectionEntity e) {
+        final TimeBlockView active = e.getActiveTimeBlockId() != null
                 ? new TimeBlockView(e.getActiveTimeBlockId(), e.getActiveTimeBlockStartedAt(), null,
                                     e.getActiveTimeBlockProjectId(), null)
                 : null;
-        List<TimeBlockView> completed = deserializeCompleted(e.getCompletedTimeBlocksJson());
+        final List<TimeBlockView> completed = deserializeCompleted(e.getCompletedTimeBlocksJson());
         return new CurrentDayView(e.getDate(), e.getStatus(), e.getVersion(), active, completed, e.getTotalWorkedMinutes());
     }
 
-    private String serializeCompleted(List<TimeBlockView> blocks) {
+    private String serializeCompleted(final List<TimeBlockView> blocks) {
         try {
             return objectMapper.writeValueAsString(blocks);
-        } catch (JsonProcessingException ex) {
+        } catch (final JsonProcessingException ex) {
             throw new ProjectionSerializationException("Failed to serialize completed time blocks", ex);
         }
     }
 
-    private List<TimeBlockView> deserializeCompleted(String json) {
+    private List<TimeBlockView> deserializeCompleted(final String json) {
         if (json == null || json.isBlank()) return List.of();
         try {
             return objectMapper.readValue(json, new TypeReference<>() {});
-        } catch (JsonProcessingException ex) {
+        } catch (final JsonProcessingException ex) {
             throw new ProjectionSerializationException("Failed to deserialize completed time blocks", ex);
         }
     }
 
     public static class ProjectionSerializationException extends RuntimeException {
-        public ProjectionSerializationException(String message, Throwable cause) { super(message, cause); }
+        public ProjectionSerializationException(final String message, final Throwable cause) { super(message, cause); }
     }
 }

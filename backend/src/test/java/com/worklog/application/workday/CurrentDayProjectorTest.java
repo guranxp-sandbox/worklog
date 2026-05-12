@@ -36,12 +36,12 @@ class CurrentDayProjectorTest {
 
     @Test
     void timeBlockStarted_createsWorkingProjection() {
-        UUID timeBlockId = UUID.randomUUID();
-        var event = new TimeBlockStarted(USER_ID, WORK_DAY_ID, timeBlockId, START_AT, TZ, null);
+        final UUID timeBlockId = UUID.randomUUID();
+        final var event = new TimeBlockStarted(USER_ID, WORK_DAY_ID, timeBlockId, START_AT, TZ, null);
 
         projector.project(WORK_DAY_ID, 1, List.of(event));
 
-        CurrentDayView view = repository.find(USER_ID, DATE).orElseThrow();
+        final CurrentDayView view = repository.find(USER_ID, DATE).orElseThrow();
         assertThat(view.status()).isEqualTo(CurrentDayView.WORKING);
         assertThat(view.version()).isEqualTo(1);
         assertThat(view.activeTimeBlock()).isNotNull();
@@ -53,14 +53,14 @@ class CurrentDayProjectorTest {
 
     @Test
     void timeBlockEnded_closesActiveBlock() {
-        UUID timeBlockId = UUID.randomUUID();
-        var started = new TimeBlockStarted(USER_ID, WORK_DAY_ID, timeBlockId, START_AT, TZ, null);
-        var ended = new TimeBlockEnded(USER_ID, WORK_DAY_ID, timeBlockId, STOP_AT, TZ, null, null);
+        final UUID timeBlockId = UUID.randomUUID();
+        final var started = new TimeBlockStarted(USER_ID, WORK_DAY_ID, timeBlockId, START_AT, TZ, null);
+        final var ended = new TimeBlockEnded(USER_ID, WORK_DAY_ID, timeBlockId, STOP_AT, TZ, null, null);
 
         projector.project(WORK_DAY_ID, 1, List.of(started));
         projector.project(WORK_DAY_ID, 2, List.of(ended));
 
-        CurrentDayView view = repository.find(USER_ID, DATE).orElseThrow();
+        final CurrentDayView view = repository.find(USER_ID, DATE).orElseThrow();
         assertThat(view.status()).isEqualTo(CurrentDayView.NOT_WORKING);
         assertThat(view.version()).isEqualTo(2);
         assertThat(view.activeTimeBlock()).isNull();
@@ -71,24 +71,24 @@ class CurrentDayProjectorTest {
 
     @Test
     void timeBlockEnded_withProjectOverride_usesStopProjectId() {
-        UUID timeBlockId = UUID.randomUUID();
-        UUID projectId = UUID.randomUUID();
-        var started = new TimeBlockStarted(USER_ID, WORK_DAY_ID, timeBlockId, START_AT, TZ, null);
-        var ended = new TimeBlockEnded(USER_ID, WORK_DAY_ID, timeBlockId, STOP_AT, TZ, projectId, null);
+        final UUID timeBlockId = UUID.randomUUID();
+        final UUID projectId = UUID.randomUUID();
+        final var started = new TimeBlockStarted(USER_ID, WORK_DAY_ID, timeBlockId, START_AT, TZ, null);
+        final var ended = new TimeBlockEnded(USER_ID, WORK_DAY_ID, timeBlockId, STOP_AT, TZ, projectId, null);
 
         projector.project(WORK_DAY_ID, 1, List.of(started));
         projector.project(WORK_DAY_ID, 2, List.of(ended));
 
-        CurrentDayView view = repository.find(USER_ID, DATE).orElseThrow();
+        final CurrentDayView view = repository.find(USER_ID, DATE).orElseThrow();
         assertThat(view.completedTimeBlocks().get(0).projectId()).isEqualTo(projectId);
     }
 
     @Test
     void multipleBlocks_accumulatesTotalMinutes() {
-        UUID block1 = UUID.randomUUID();
-        UUID block2 = UUID.randomUUID();
-        Instant start2 = Instant.parse("2026-04-28T10:00:00Z");
-        Instant stop2  = Instant.parse("2026-04-28T11:30:00Z"); // 90 min
+        final UUID block1 = UUID.randomUUID();
+        final UUID block2 = UUID.randomUUID();
+        final Instant start2 = Instant.parse("2026-04-28T10:00:00Z");
+        final Instant stop2  = Instant.parse("2026-04-28T11:30:00Z"); // 90 min
 
         projector.project(WORK_DAY_ID, 1, List.of(
                 new TimeBlockStarted(USER_ID, WORK_DAY_ID, block1, START_AT, TZ, null)));
@@ -99,7 +99,7 @@ class CurrentDayProjectorTest {
         projector.project(WORK_DAY_ID, 4, List.of(
                 new TimeBlockEnded(USER_ID, WORK_DAY_ID, block2, stop2, TZ, null, null)));
 
-        CurrentDayView view = repository.find(USER_ID, DATE).orElseThrow();
+        final CurrentDayView view = repository.find(USER_ID, DATE).orElseThrow();
         assertThat(view.completedTimeBlocks()).hasSize(2);
         assertThat(view.totalWorkedMinutes()).isEqualTo(210); // 120 + 90
     }
@@ -110,12 +110,12 @@ class CurrentDayProjectorTest {
         private final java.util.Map<String, CurrentDayView> store = new java.util.HashMap<>();
 
         @Override
-        public Optional<CurrentDayView> find(UUID userId, LocalDate date) {
+        public Optional<CurrentDayView> find(final UUID userId, final LocalDate date) {
             return Optional.ofNullable(store.get(userId + ":" + date));
         }
 
         @Override
-        public void save(UUID userId, CurrentDayView view) {
+        public void save(final UUID userId, final CurrentDayView view) {
             store.put(userId + ":" + view.date(), view);
         }
     }

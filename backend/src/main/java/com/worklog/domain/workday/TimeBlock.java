@@ -10,7 +10,7 @@ public class TimeBlock {
     private Instant endedAt;
     private UUID projectId;
 
-    public TimeBlock(UUID id, Instant startedAt, Instant endedAt, UUID projectId) {
+    public TimeBlock(final UUID id, final Instant startedAt, final Instant endedAt, final UUID projectId) {
         this.id = id;
         this.startedAt = startedAt;
         this.endedAt = endedAt;
@@ -21,7 +21,7 @@ public class TimeBlock {
         return endedAt == null;
     }
 
-    public void close(Instant endedAt, UUID projectId) {
+    public void close(final Instant endedAt, final UUID projectId) {
         this.endedAt = endedAt;
         if (projectId != null) {
             this.projectId = projectId;

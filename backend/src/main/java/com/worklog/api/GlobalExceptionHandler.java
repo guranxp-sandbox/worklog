@@ -16,17 +16,17 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(DomainException.class)
-    public ProblemDetail handleDomainException(DomainException ex) {
+    public ProblemDetail handleDomainException(final DomainException ex) {
         log.debug("Domain rule violated: {}", ex.getMessage());
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+        final ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
         problem.setTitle("Domain rule violated");
         return problem;
     }
 
     @ExceptionHandler(OptimisticLockException.class)
-    public ProblemDetail handleOptimisticLock(OptimisticLockException ex) {
+    public ProblemDetail handleOptimisticLock(final OptimisticLockException ex) {
         log.debug("Version conflict: {}", ex.getMessage());
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        final ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Version conflict");
         return problem;
     }

@@ -28,7 +28,7 @@ class GetDayIntegrationTest {
 
     @Test
     void getDay_neverStarted_returnsNotWorking() throws Exception {
-        UUID userId = UUID.randomUUID();
+        final UUID userId = UUID.randomUUID();
 
         mockMvc.perform(get("/days/2020-06-01").param("userId", userId.toString()))
                 .andExpect(status().isOk())
@@ -40,11 +40,11 @@ class GetDayIntegrationTest {
 
     @Test
     void getDay_afterStartWork_returnsWorking() throws Exception {
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
-        String date = "2020-06-02";
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
+        final String date = "2020-06-02";
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", UUID.randomUUID(),
@@ -68,11 +68,11 @@ class GetDayIntegrationTest {
 
     @Test
     void getDay_afterStopWork_returnsNotWorkingWithCompletedBlock() throws Exception {
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
-        String date = "2020-06-03";
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
+        final String date = "2020-06-03";
 
-        String startBody = objectMapper.writeValueAsString(Map.of(
+        final String startBody = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", UUID.randomUUID(),
@@ -84,7 +84,7 @@ class GetDayIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON).content(startBody))
                 .andExpect(status().isCreated());
 
-        String stopBody = objectMapper.writeValueAsString(Map.of(
+        final String stopBody = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", UUID.randomUUID(),

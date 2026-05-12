@@ -46,10 +46,10 @@ public class CurrentDayProjectionEntity {
 
     protected CurrentDayProjectionEntity() {}
 
-    public CurrentDayProjectionEntity(String id, UUID userId, LocalDate date, String status, int version,
-                                       UUID activeTimeBlockId, Instant activeTimeBlockStartedAt,
-                                       UUID activeTimeBlockProjectId, String completedTimeBlocksJson,
-                                       int totalWorkedMinutes) {
+    public CurrentDayProjectionEntity(final String id, final UUID userId, final LocalDate date, final String status, final int version,
+                                       final UUID activeTimeBlockId, final Instant activeTimeBlockStartedAt,
+                                       final UUID activeTimeBlockProjectId, final String completedTimeBlocksJson,
+                                       final int totalWorkedMinutes) {
         this.id = id;
         this.userId = userId;
         this.date = date;

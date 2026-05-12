@@ -34,11 +34,11 @@ class StartWorkIntegrationTest {
 
     @Test
     void startWork_happyPath_returns201() throws Exception {
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
-        UUID requestId = UUID.randomUUID();
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
+        final UUID requestId = UUID.randomUUID();
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", requestId,
@@ -57,11 +57,11 @@ class StartWorkIntegrationTest {
 
     @Test
     void startWork_duplicateRequestId_returns200() throws Exception {
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
-        UUID requestId = UUID.randomUUID();
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
+        final UUID requestId = UUID.randomUUID();
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", requestId,
@@ -83,11 +83,11 @@ class StartWorkIntegrationTest {
 
     @Test
     void startWork_openBlockExists_returns409() throws Exception {
-        UUID userId = UUID.randomUUID();
-        String date = "2020-02-10";
-        String timestamp = "2020-02-10T08:00:00Z";
+        final UUID userId = UUID.randomUUID();
+        final String date = "2020-02-10";
+        final String timestamp = "2020-02-10T08:00:00Z";
 
-        String firstBody = objectMapper.writeValueAsString(Map.of(
+        final String firstBody = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", UUID.randomUUID(),
                 "requestId", UUID.randomUUID(),
@@ -101,7 +101,7 @@ class StartWorkIntegrationTest {
                         .content(firstBody))
                 .andExpect(status().isCreated());
 
-        String secondBody = objectMapper.writeValueAsString(Map.of(
+        final String secondBody = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", UUID.randomUUID(),
                 "requestId", UUID.randomUUID(),
@@ -119,7 +119,7 @@ class StartWorkIntegrationTest {
 
     @Test
     void startWork_futureTimestamp_returns422() throws Exception {
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", UUID.randomUUID(),
                 "timeBlockId", UUID.randomUUID(),
                 "requestId", UUID.randomUUID(),
@@ -137,10 +137,10 @@ class StartWorkIntegrationTest {
 
     @Test
     void startWork_versionConflict_returns409() throws Exception {
-        UUID userId = UUID.randomUUID();
-        String date = "2020-03-10";
+        final UUID userId = UUID.randomUUID();
+        final String date = "2020-03-10";
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", UUID.randomUUID(),
                 "requestId", UUID.randomUUID(),

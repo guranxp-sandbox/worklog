@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class DuplicateRequestException extends RuntimeException {
 
-    public DuplicateRequestException(UUID requestId) {
+    public DuplicateRequestException(final UUID requestId) {
         super("Request " + requestId + " was already processed");
     }
 }

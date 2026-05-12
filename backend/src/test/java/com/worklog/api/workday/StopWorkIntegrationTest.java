@@ -28,8 +28,8 @@ class StopWorkIntegrationTest {
 
     private static final String TIMEZONE = "Europe/Stockholm";
 
-    private void startWork(String date, String timestamp, UUID userId, UUID timeBlockId) throws Exception {
-        String body = objectMapper.writeValueAsString(Map.of(
+    private void startWork(final String date, final String timestamp, final UUID userId, final UUID timeBlockId) throws Exception {
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", UUID.randomUUID(),
@@ -45,13 +45,13 @@ class StopWorkIntegrationTest {
 
     @Test
     void stopWork_happyPath_returns201() throws Exception {
-        String date = "2020-04-01";
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
+        final String date = "2020-04-01";
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
 
         startWork(date, "2020-04-01T07:00:00Z", userId, timeBlockId);
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", UUID.randomUUID(),
@@ -70,14 +70,14 @@ class StopWorkIntegrationTest {
 
     @Test
     void stopWork_duplicateRequestId_returns200() throws Exception {
-        String date = "2020-04-02";
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
-        UUID requestId = UUID.randomUUID();
+        final String date = "2020-04-02";
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
+        final UUID requestId = UUID.randomUUID();
 
         startWork(date, "2020-04-02T07:00:00Z", userId, timeBlockId);
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", requestId,
@@ -99,10 +99,10 @@ class StopWorkIntegrationTest {
 
     @Test
     void stopWork_noOpenBlock_returns422() throws Exception {
-        String date = "2020-04-03";
-        UUID userId = UUID.randomUUID();
+        final String date = "2020-04-03";
+        final UUID userId = UUID.randomUUID();
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", UUID.randomUUID(),
                 "requestId", UUID.randomUUID(),
@@ -120,13 +120,13 @@ class StopWorkIntegrationTest {
 
     @Test
     void stopWork_wrongTimeBlockId_returns422() throws Exception {
-        String date = "2020-04-04";
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
+        final String date = "2020-04-04";
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
 
         startWork(date, "2020-04-04T07:00:00Z", userId, timeBlockId);
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", UUID.randomUUID(),
                 "requestId", UUID.randomUUID(),
@@ -144,13 +144,13 @@ class StopWorkIntegrationTest {
 
     @Test
     void stopWork_futureTimestamp_returns422() throws Exception {
-        String date = "2020-04-05";
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
+        final String date = "2020-04-05";
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
 
         startWork(date, "2020-04-05T07:00:00Z", userId, timeBlockId);
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", UUID.randomUUID(),
@@ -168,13 +168,13 @@ class StopWorkIntegrationTest {
 
     @Test
     void stopWork_timestampDateMismatch_returns422() throws Exception {
-        String date = "2020-04-07";
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
+        final String date = "2020-04-07";
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
 
         startWork(date, "2020-04-07T07:00:00Z", userId, timeBlockId);
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", UUID.randomUUID(),
@@ -192,13 +192,13 @@ class StopWorkIntegrationTest {
 
     @Test
     void stopWork_versionConflict_returns409() throws Exception {
-        String date = "2020-04-06";
-        UUID userId = UUID.randomUUID();
-        UUID timeBlockId = UUID.randomUUID();
+        final String date = "2020-04-06";
+        final UUID userId = UUID.randomUUID();
+        final UUID timeBlockId = UUID.randomUUID();
 
         startWork(date, "2020-04-06T07:00:00Z", userId, timeBlockId);
 
-        String body = objectMapper.writeValueAsString(Map.of(
+        final String body = objectMapper.writeValueAsString(Map.of(
                 "userId", userId,
                 "timeBlockId", timeBlockId,
                 "requestId", UUID.randomUUID(),

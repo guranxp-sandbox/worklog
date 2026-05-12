@@ -4,7 +4,7 @@ import com.worklog.domain.workday.WorkDayId;
 
 public class OptimisticLockException extends RuntimeException {
 
-    public OptimisticLockException(WorkDayId id, int expected, int actual) {
+    public OptimisticLockException(final WorkDayId id, final int expected, final int actual) {
         super("Version conflict for " + id.toStreamId() + ": expected " + expected + ", actual " + actual);
     }
 }

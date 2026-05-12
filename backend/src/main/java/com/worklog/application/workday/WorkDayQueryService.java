@@ -11,11 +11,11 @@ public class WorkDayQueryService {
 
     private final CurrentDayProjectionRepository projectionRepository;
 
-    public WorkDayQueryService(CurrentDayProjectionRepository projectionRepository) {
+    public WorkDayQueryService(final CurrentDayProjectionRepository projectionRepository) {
         this.projectionRepository = projectionRepository;
     }
 
-    public CurrentDayView getCurrentDayView(UUID userId, LocalDate date) {
+    public CurrentDayView getCurrentDayView(final UUID userId, final LocalDate date) {
         return projectionRepository.find(userId, date)
                 .orElseGet(() -> new CurrentDayView(date, CurrentDayView.NOT_WORKING, 0, null, List.of(), 0));
     }

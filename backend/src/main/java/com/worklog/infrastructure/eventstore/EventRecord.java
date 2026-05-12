@@ -39,8 +39,8 @@ public class EventRecord {
 
     protected EventRecord() {}
 
-    public EventRecord(UUID id, String streamId, int sequenceNumber, String type,
-                       String payload, UUID requestId, Instant occurredAt) {
+    public EventRecord(final UUID id, final String streamId, final int sequenceNumber, final String type,
+                       final String payload, final UUID requestId, final Instant occurredAt) {
         this.id = id;
         this.streamId = streamId;
         this.sequenceNumber = sequenceNumber;

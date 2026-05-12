@@ -22,8 +22,8 @@ public class JpaWorkDayRepository implements WorkDayRepository {
     private final EventSerializer serializer;
     private final CurrentDayProjector projector;
 
-    public JpaWorkDayRepository(EventStoreJpaRepository jpaRepository, EventSerializer serializer,
-                                 CurrentDayProjector projector) {
+    public JpaWorkDayRepository(final EventStoreJpaRepository jpaRepository, final EventSerializer serializer,
+                                 final CurrentDayProjector projector) {
         this.jpaRepository = jpaRepository;
         this.serializer = serializer;
         this.projector = projector;
@@ -31,18 +31,18 @@ public class JpaWorkDayRepository implements WorkDayRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isRequestAlreadyProcessed(UUID requestId) {
+    public boolean isRequestAlreadyProcessed(final UUID requestId) {
         return jpaRepository.existsByRequestId(requestId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<WorkDay> load(WorkDayId id) {
-        List<EventRecord> records = jpaRepository.findByStreamIdOrderBySequenceNumber(id.toStreamId());
+    public Optional<WorkDay> load(final WorkDayId id) {
+        final List<EventRecord> records = jpaRepository.findByStreamIdOrderBySequenceNumber(id.toStreamId());
         if (records.isEmpty()) {
             return Optional.empty();
         }
-        List<DomainEvent> history = records.stream()
+        final List<DomainEvent> history = records.stream()
                 .map(r -> serializer.deserialize(r.getType(), r.getPayload()))
                 .toList();
         return Optional.of(WorkDay.reconstitute(id, history));
@@ -50,16 +50,16 @@ public class JpaWorkDayRepository implements WorkDayRepository {
 
     @Override
     @Transactional
-    public void save(WorkDay workDay, UUID requestId) {
+    public void save(final WorkDay workDay, final UUID requestId) {
         if (jpaRepository.existsByRequestId(requestId)) {
             throw new DuplicateRequestException(requestId);
         }
 
-        List<DomainEvent> uncommitted = workDay.getUncommittedEvents();
+        final List<DomainEvent> uncommitted = workDay.getUncommittedEvents();
         int nextSeq = workDay.getVersion() + 1;
 
-        for (DomainEvent event : uncommitted) {
-            EventRecord record = new EventRecord(
+        for (final DomainEvent event : uncommitted) {
+            final EventRecord record = new EventRecord(
                     UUID.randomUUID(),
                     workDay.getId().toStreamId(),
                     nextSeq++,
@@ -71,13 +71,13 @@ public class JpaWorkDayRepository implements WorkDayRepository {
             try {
                 jpaRepository.save(record);
                 jpaRepository.flush();
-            } catch (DataIntegrityViolationException e) {
+            } catch (final DataIntegrityViolationException e) {
                 throw new com.worklog.application.workday.OptimisticLockException(
                         workDay.getId(), workDay.getVersion(), nextSeq - 2);
             }
         }
 
-        int newVersion = workDay.getVersion() + uncommitted.size();
+        final int newVersion = workDay.getVersion() + uncommitted.size();
         projector.project(workDay.getId(), newVersion, uncommitted);
 
         workDay.markEventsAsCommitted();
